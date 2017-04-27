@@ -1,10 +1,12 @@
 $(document).ready(function () {
     getTasks();
+    getCategories();
     getCategoryOptions();
 
     $('#add_task').on('submit', addTask);
     $('#edit_task').on('submit', editTask);
     $('body').on('click', '.btn-edit-task', setTask); // bind event to all button 
+    $('body').on('click', '.btn-delete-task', deleteTask); // bind event to all button 
 });
 
 const apiKey = "DCT90lxiIof3NBf6OOrs9qoWeAakMXjq";
@@ -19,12 +21,28 @@ function getTasks() {
                 output += '<span class="label label-danger">Urgent</span>';
             }
             output += '<div class="pull-right">' +
-                '<a class="btn btn-primary btn-edit-task" data-task-name="' + task.task_name + '" data-task-id="' + task._id.$oid + '">Edit</a>' +
-                '<a class="btn btn-danger" href="#">Delete</a>' +
-                '</div>';
+                    '<a class="btn btn-primary btn-edit-task" data-task-name="' + task.task_name + '" data-task-id="' + task._id.$oid + '">Edit</a>' +
+                    '<a class="btn btn-danger" href="#">Delete</a>' +
+                    '</div>';
         });
         output += '</ul>';
         $('#tasks').html(output);
+    })
+}
+
+function getCategories() {
+    $.get('https://api.mlab.com/api/1/databases/taskmanager/collections/categories?apiKey=' + apiKey, function (data) {
+        let output = '<ul class="list-group">';
+        $.each(data, function (key, category) {
+            output += '<li class="list-group-item">';
+            output += category.category_name;
+            output += '<div class="pull-right">' +
+                '<a class="btn btn-primary btn-edit-category" data-category-name="' + category.category_name + '" data-category-id="' + category._id.$oid + '">Edit</a>' +
+                '<a class="btn btn-danger btn-delete-category" data-category-name="' + category.category_name + '" data-category-id="' + category._id.$oid + '">Delete</a>' +
+                '</div>';
+        });
+        output += '</ul>';
+        $('#categories').html(output);
     })
 }
 
@@ -98,6 +116,25 @@ function editTask(e) {
             "is_urgent": is_urgent,
         }),
         type: 'PUT',
+        contentType: 'application/json',
+        success: function (data) {
+            window.location.href = 'index.html';
+        },
+        error: function (xhr, status, err) {
+            console.log(err);
+        }
+    });
+
+    e.preventDefault();
+}
+
+function deleteTask(e) {
+    var task_id = sessionStorage.getItem("current_id");
+    
+    $.ajax({
+        url: 'https://api.mlab.com/api/1/databases/taskmanager/collections/tasks/'+task_id+'?apiKey=' + apiKey,
+        type: 'DELETE',
+        async : true,
         contentType: 'application/json',
         success: function (data) {
             window.location.href = 'index.html';
