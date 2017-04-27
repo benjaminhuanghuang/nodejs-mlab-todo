@@ -206,7 +206,25 @@ function setCategory() {
 function getCategory(id)
 {
     $.get('https://api.mlab.com/api/1/databases/taskmanager/collections/categories/'+id+'?apiKey=' + apiKey, function(category){
-        console.log("---------", category);
         $('#category_name').val(category.category_name);
     } );
+}
+
+function deleteCategory(e) {
+    var category_id = $(this).data("category-id");
+    
+    $.ajax({
+        url: 'https://api.mlab.com/api/1/databases/taskmanager/collections/categories/'+category_id+'?apiKey=' + apiKey,
+        type: 'DELETE',
+        async : true,
+        contentType: 'application/json',
+        success: function (data) {
+            window.location.href = 'categories.html';
+        },
+        error: function (xhr, status, err) {
+            console.log(err);
+        }
+    });
+
+    e.preventDefault();
 }
