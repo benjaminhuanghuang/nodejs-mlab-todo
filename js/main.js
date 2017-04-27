@@ -7,6 +7,10 @@ $(document).ready(function () {
     $('#edit_task').on('submit', editTask);
     $('body').on('click', '.btn-edit-task', setTask); // bind event to all button 
     $('body').on('click', '.btn-delete-task', deleteTask); // bind event to all button 
+
+
+    $('#add_category').on('submit', addCategory);
+    $('#edit_category').on('submit', editCategory);
 });
 
 const apiKey = "DCT90lxiIof3NBf6OOrs9qoWeAakMXjq";
@@ -145,4 +149,29 @@ function deleteTask(e) {
     });
 
     e.preventDefault();
+}
+
+function addCategory(e) {
+    e.preventDefault();
+
+    var category_name = $('#category_name').val();
+  
+    $.ajax({
+        url: 'https://api.mlab.com/api/1/databases/taskmanager/collections/categories?apiKey=' + apiKey,
+        data: JSON.stringify({
+            "category_name": category_name
+        }),
+        type: 'POST',
+        contentType: 'application/json',
+        success: function (data) {
+            window.location.href = 'categories.html';
+        },
+        error: function (xhr, status, err) {
+            console.log(err);
+        }
+    });
+}
+
+function editCategory(e) {
+
 }
