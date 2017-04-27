@@ -3,7 +3,7 @@ $(document).ready(function () {
     getCategoryOptions();
 
     $('#add_task').on('submit', addTask);
-    $('body').on('click', '.btn-edit-task', setTask);
+    $('body').on('click', '.btn-edit-task', setTask); // bind event to all button 
 });
 
 const apiKey = "DCT90lxiIof3NBf6OOrs9qoWeAakMXjq";
@@ -17,10 +17,10 @@ function getTasks() {
             if (task.is_urgent == 'true') {
                 output += '<span class="label label-danger">Urgent</span>';
             }
-            output += '<div class="pull-right">'+
-                      '<a class="btn btn-primary btn-edit-task" data-task-name="'+task.task_name+'" data-task-id="'+task._id.$oid+'">Edit</a>'+
-                      '<a class="btn btn-danger" href="#">Delete</a>'+
-                      '</div>';
+            output += '<div class="pull-right">' +
+                '<a class="btn btn-primary btn-edit-task" data-task-name="' + task.task_name + '" data-task-id="' + task._id.$oid + '">Edit</a>' +
+                '<a class="btn btn-danger" href="#">Delete</a>' +
+                '</div>';
         });
         output += '</ul>';
         $('#tasks').html(output);
@@ -46,27 +46,35 @@ function addTask(e) {
     var is_urgent = $('#is_urgent').val();
 
     $.ajax({
-        url:'https://api.mlab.com/api/1/databases/taskmanager/collections/tasks?apiKey=' + apiKey,
+        url: 'https://api.mlab.com/api/1/databases/taskmanager/collections/tasks?apiKey=' + apiKey,
         data: JSON.stringify({
-            "task_name":task_name,
-            "category":category,
-            "due_date":due_date,
-            "is_urgent":is_urgent,
+            "task_name": task_name,
+            "category": category,
+            "due_date": due_date,
+            "is_urgent": is_urgent,
         }),
-        type:'POST',
+        type: 'POST',
         contentType: 'application/json',
-        success:function(data){
-            window.location.href='index.html';
+        success: function (data) {
+            window.location.href = 'index.html';
         },
-        error:function(xhr, status, err){
-            console.log(err); 
+        error: function (xhr, status, err) {
+            console.log(err);
         }
     });
 }
 
-function setTask()
-{
+function setTask() {
     var task_id = $(this).data('task-id');
-    console.log(task_id);
+    sessionStorage.setItem('current_id', task_id);
+    window.location.href = 'edittask.html';
+    return false;
+}
 
+function getTask(id)
+{
+    $.get('https://api.mlab.com/api/1/databases/taskmanager/collections/tasks/'+id+'?apiKey=' + apiKey, function(task){
+        $('#task_name').val(task.task_name);
+        
+    } );
 }
