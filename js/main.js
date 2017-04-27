@@ -11,6 +11,8 @@ $(document).ready(function () {
 
     $('#add_category').on('submit', addCategory);
     $('#edit_category').on('submit', editCategory);
+    $('body').on('click', '.btn-edit-category', setCategory); // bind event to all button 
+    $('body').on('click', '.btn-delete-category', deleteCategory); // bind event to all button 
 });
 
 const apiKey = "DCT90lxiIof3NBf6OOrs9qoWeAakMXjq";
@@ -173,5 +175,38 @@ function addCategory(e) {
 }
 
 function editCategory(e) {
+    var category_id = sessionStorage.getItem("category_id");
+    var category_name = $('#category_name').val();
+   
+    $.ajax({
+        url: 'https://api.mlab.com/api/1/databases/taskmanager/collections/categories/'+category_id+'?apiKey=' + apiKey,
+        data: JSON.stringify({
+            "category_name": category_name,
+        }),
+        type: 'PUT',
+        contentType: 'application/json',
+        success: function (data) {
+            window.location.href = 'categories.html';
+        },
+        error: function (xhr, status, err) {
+            console.log(err);
+        }
+    });
 
+    e.preventDefault();
+}
+
+function setCategory() {
+    var category_id = $(this).data('category-id');
+    sessionStorage.setItem('category_id', category_id);
+    window.location.href = 'editcategory.html';
+    return false;
+}
+
+function getCategory(id)
+{
+    $.get('https://api.mlab.com/api/1/databases/taskmanager/collections/categories/'+id+'?apiKey=' + apiKey, function(category){
+        console.log("---------", category);
+        $('#category_name').val(category.category_name);
+    } );
 }
